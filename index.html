@@ -1,1 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>WhatsApp Logger</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/postmonger/postmonger.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+            background: #fff;
+            font-size: 13px;
+        }
+        h3 {
+            color: #1b5e20;
+            margin-bottom: 16px;
+            font-size: 15px;
+            text-align: center;
+        }
+        .field { margin-bottom: 12px; }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #444;
+            font-size: 12px;
+        }
+        input, select {
+            width: 100%;
+            padding: 7px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #333;
+            background: #fff;
+        }
+        .hint { font-size: 11px; color: #888; margin-top: 3px; }
+        .badge {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 11px;
+            color: #1b5e20;
+            margin-left: 6px;
+        }
+        .de-key-display {
+            font-size: 11px;
+            color: #1565c0;
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin-bottom: 14px;
+            word-break: break-all;
+        }
+        .de-key-display span { font-weight: bold; }
+        .section-divider {
+            font-size: 11px;
+            font-weight: bold;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 16px 0 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
 
+<h3>💬 WhatsApp Logger <span class="badge">Active</span></h3>
+
+<div class="de-key-display" id="deKeyDisplay" style="display:none;">
+    <span>Entry DE Key:</span> <span id="deKeyValue"></span>
+</div>
+
+<div class="section-divider">Contact Fields</div>
+
+<div class="field">
+    <label>Mobile Number Token</label>
+    <input type="text" id="mobileNumber" readonly />
+    <div class="hint">Auto-mapped from Entry DE</div>
+</div>
+
+<div class="field">
+    <label>Lead ID Token</label>
+    <input type="text" id="leadId" readonly />
+    <div class="hint">Auto-mapped from Entry DE</div>
+</div>
+
+<div class="field">
+    <label>Application ID Token</label>
+    <input type="text" id="applicationId" readonly />
+    <div class="hint">Auto-mapped from Entry DE</div>
+</div>
+
+<div class="section-divider">WhatsApp Fields</div>
+
+<div class="field">
+    <label>Message ID Token</label>
+    <input type="text" id="messageId" readonly />
+    <div class="hint">Auto-mapped from WhatsApp activity</div>
+</div>
+
+<div class="field">
+    <label>WhatsApp Channel ID Token</label>
+    <input type="text" id="whatsAppChannelId" readonly />
+    <div class="hint">Auto-mapped from WhatsApp activity</div>
+</div>
+
+<div class="field">
+    <label>Template Name Token</label>
+    <input type="text" id="templateName" readonly />
+    <div class="hint">Auto-mapped from WhatsApp activity</div>
+</div>
+
+<div class="section-divider">Settings</div>
+
+<div class="field">
+    <label>Source</label>
+    <select id="source">
+        <option value="Journey">Journey</option>
+        <option value="API">API</option>
+        <option value="Manual">Manual</option>
+        <option value="Campaign">Campaign</option>
+    </select>
+    <div class="hint">Source identifier for this log entry</div>
+</div>
+
+<script>
+
+    var connection    = new Postmonger.Session();
+    var payload       = {};
+    var entryDeKey    = '';
+    var activityReady = false;
+
+    $(window).ready(function () {
+        connection.on('initActivity',    onInitActivity);
+        connection.on('clickedNext',     onSave);
+        connection.on('requestedTriggerEventDefinition', onTriggerEventReceived);
+        connection.trigger('ready');
+    });
+
+    function onInitActivity(data) {
+        if (data) { payload = data; }
+
+        var savedArgs = extractArgs(payload);
+
+        if (savedArgs.entryDeKey && savedArgs.entryDeKey !== '') {
+            entryDeKey = savedArgs.entryDeKey;
+            applyTokens(entryDeKey);
+            applyWhatsAppTokens();
+            $('#source').val(savedArgs.source || 'Journey');
+        } else {
+            connection.trigger('requestTriggerEventDefinition');
+        }
+    }
+
+    function onTriggerEventReceived(eventDef) {
+        try {
+            if (eventDef && (eventDef.id || eventDef.key)) {
+                entryDeKey = eventDef.key || eventDef.id || '';
+                if (entryDeKey !== '') {
+                    applyTokens(entryDeKey);
+                    applyWhatsAppTokens();
+                    return;
+                }
+            }
+        } catch(e) {}
+        enableManualInput();
+    }
+
+    function applyTokens(deKey) {
+        $('#mobileNumber').val('{{Event.' + deKey + '.MobileNumber}}');
+        $('#leadId').val('{{Event.' + deKey + '.LeadId}}');
+        $('#applicationId').val('{{Event.' + deKey + '.ApplicationId}}');
+
+        $('#deKeyValue').text(deKey);
+        $('#deKeyDisplay').show();
+    }
+
+    function applyWhatsAppTokens() {
+        $('#messageId').val('{{Activity.Message.Id}}');
+        $('#whatsAppChannelId').val('{{Activity.Channel.Id}}');
+        $('#templateName').val('{{Activity.Message.TemplateName}}');
+    }
+
+    function enableManualInput() {
+        $('#mobileNumber').removeAttr('readonly')
+            .attr('placeholder', 'e.g. {{Event.YOUR-DE-KEY.MobileNumber}}');
+        $('#leadId').removeAttr('readonly')
+            .attr('placeholder', 'e.g. {{Event.YOUR-DE-KEY.LeadId}}');
+        $('#applicationId').removeAttr('readonly')
+            .attr('placeholder', 'e.g. {{Event.YOUR-DE-KEY.ApplicationId}}');
+        $('#messageId').removeAttr('readonly')
+            .attr('placeholder', '{{Activity.Message.Id}}');
+        $('#whatsAppChannelId').removeAttr('readonly')
+            .attr('placeholder', '{{Activity.Channel.Id}}');
+        $('#templateName').removeAttr('readonly')
+            .attr('placeholder', '{{Activity.Message.TemplateName}}');
+
+        $('#deKeyDisplay')
+            .css('background', '#fff3e0')
+            .css('border-color', '#ffb74d')
+            .show();
+        $('#deKeyValue').text('Could not detect — please type tokens manually');
+    }
+
+    function onSave() {
+        payload.metaData.isConfigured = true;
+
+        var deKey  = entryDeKey || 'B405B07A-6C45-4AD6-8F3F-887A4BE96782';
+        var mobile = $('#mobileNumber').val()      || '{{Event.' + deKey + '.MobileNumber}}';
+        var lead   = $('#leadId').val()            || '{{Event.' + deKey + '.LeadId}}';
+        var app    = $('#applicationId').val()     || '{{Event.' + deKey + '.ApplicationId}}';
+        var msgId  = $('#messageId').val()         || '{{Activity.Message.Id}}';
+        var waChId = $('#whatsAppChannelId').val() || '{{Activity.Channel.Id}}';
+        var tmpl   = $('#templateName').val()      || '{{Activity.Message.TemplateName}}';
+
+        payload.arguments.execute.inArguments = [
+            { "subscriberKey":     "{{Contact.Key}}" },
+            { "mobileNumber":      mobile },
+            { "leadId":            lead },
+            { "applicationId":     app },
+            { "journeyId":         "{{Interaction.InteractionId}}" },
+            { "journeyVersion":    "{{Interaction.InteractionVersionId}}" },
+            { "activityId":        "{{Activity.Id}}" },
+            { "activityName":      "{{Activity.Name}}" },
+            { "messageId":         msgId },
+            { "whatsAppChannelId": waChId },
+            { "templateName":      tmpl },
+            { "source":            $('#source').val() },
+            { "entryDeKey":        deKey }
+        ];
+
+        connection.trigger('updateActivity', payload);
+    }
+
+    function extractArgs(pl) {
+        var args = {};
+        try {
+            if (pl.arguments && pl.arguments.execute && pl.arguments.execute.inArguments) {
+                pl.arguments.execute.inArguments.forEach(function(obj) {
+                    var key = Object.keys(obj)[0];
+                    args[key] = obj[key];
+                });
+            }
+        } catch(e) {}
+        return args;
+    }
+
+</script>
+</body>
+</html>
