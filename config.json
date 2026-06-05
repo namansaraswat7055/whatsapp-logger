@@ -1,1 +1,76 @@
-
+{
+  "workflowApiVersion": "1.1",
+  "metaData": {
+    "category": "message",
+    "icon": "https://cdn-icons-png.flaticon.com/512/733/733585.png",
+    "configOnDrop": true
+  },
+  "type": "REST",
+  "lang": {
+    "en-US": {
+      "name": "WhatsApp Logger",
+      "description": "Logs WhatsApp data into SendLogMasterWhatsapp"
+    }
+  },
+  "arguments": {
+    "execute": {
+      "url": "https://mczklys7qkb4rf8qkq-dpww0j3-8.pub.sfmc-content.com/g5wzzj3iilu",
+      "verb": "POST",
+      "format": "json",
+      "timeout": 10000,
+      "inArguments": [
+        { "subscriberKey":     "{{ContactKey}}" },
+        { "mobileNumber":      "{{Event.B405B07A-6C45-4AD6-8F3F-887A4BE96782.MobileNumber}}" },
+        { "leadId":            "{{Event.B405B07A-6C45-4AD6-8F3F-887A4BE96782.LeadId}}" },
+        { "applicationId":     "{{Event.B405B07A-6C45-4AD6-8F3F-887A4BE96782.ApplicationId}}" },
+        { "journeyId":         "{{Interaction.InteractionId}}" },
+        { "journeyVersion":    "{{Interaction.InteractionVersionId}}" },
+        { "activityId":        "{{ActivityId}}" },
+        { "activityName":      "{{Activity.Name}}" },
+        { "messageId":         "{{Activity.Message.Id}}" },
+        { "whatsAppChannelId": "{{Activity.Channel.Id}}" },
+        { "templateName":      "{{Activity.Message.TemplateName}}" },
+        { "source":            "Journey" },
+        { "entryDeKey":        "B405B07A-6C45-4AD6-8F3F-887A4BE96782" }
+      ],
+      "outArguments": []
+    }
+  },
+  "configurationArguments": {
+    "applicationExtensionKey": "37025370-a50c-4aac-97d8-ec44885ed38e",
+    "save":     { "url": "https://mczklys7qkb4rf8qkq-dpww0j3-8.pub.sfmc-content.com/io43ocrjovv" },
+    "publish":  { "url": "https://mczklys7qkb4rf8qkq-dpww0j3-8.pub.sfmc-content.com/io43ocrjovv" },
+    "validate": { "url": "https://mczklys7qkb4rf8qkq-dpww0j3-8.pub.sfmc-content.com/io43ocrjovv" },
+    "stop":     { "url": "https://mczklys7qkb4rf8qkq-dpww0j3-8.pub.sfmc-content.com/io43ocrjovv" }
+  },
+  "userInterfaces": {
+    "configModal": {
+      "url": "https://namansaraswat7055.github.io/whatsapp-logger/index.html",
+      "height": 500,
+      "width": 600,
+      "fullscreen": false
+    }
+  },
+  "schema": {
+    "arguments": {
+      "execute": {
+        "inArguments": [
+          { "subscriberKey":     { "dataType": "Text",  "direction": "in" } },
+          { "mobileNumber":      { "dataType": "Phone", "direction": "in" } },
+          { "leadId":            { "dataType": "Text",  "direction": "in" } },
+          { "applicationId":     { "dataType": "Text",  "direction": "in" } },
+          { "journeyId":         { "dataType": "Text",  "direction": "in" } },
+          { "journeyVersion":    { "dataType": "Text",  "direction": "in" } },
+          { "activityId":        { "dataType": "Text",  "direction": "in" } },
+          { "activityName":      { "dataType": "Text",  "direction": "in" } },
+          { "messageId":         { "dataType": "Text",  "direction": "in" } },
+          { "whatsAppChannelId": { "dataType": "Text",  "direction": "in" } },
+          { "templateName":      { "dataType": "Text",  "direction": "in" } },
+          { "source":            { "dataType": "Text",  "direction": "in" } },
+          { "entryDeKey":        { "dataType": "Text",  "direction": "in" } }
+        ],
+        "outArguments": []
+      }
+    }
+  }
+}
