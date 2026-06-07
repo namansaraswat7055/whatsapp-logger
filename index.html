@@ -98,25 +98,7 @@
     <div class="hint">Auto-mapped from Entry DE</div>
 </div>
 
-<div class="section-divider">WhatsApp Fields</div>
 
-<div class="field">
-    <label>Message ID Token</label>
-    <input type="text" id="messageId" readonly />
-    <div class="hint">Auto-mapped from WhatsApp activity</div>
-</div>
-
-<div class="field">
-    <label>WhatsApp Channel ID Token</label>
-    <input type="text" id="whatsAppChannelId" readonly />
-    <div class="hint">Auto-mapped from WhatsApp activity</div>
-</div>
-
-<div class="field">
-    <label>Template Name Token</label>
-    <input type="text" id="templateName" readonly />
-    <div class="hint">Auto-mapped from WhatsApp activity</div>
-</div>
 
 <div class="section-divider">Settings</div>
 
@@ -196,12 +178,6 @@
             .attr('placeholder', 'e.g. {{Event.YOUR-DE-KEY.LeadId}}');
         $('#applicationId').removeAttr('readonly')
             .attr('placeholder', 'e.g. {{Event.YOUR-DE-KEY.ApplicationId}}');
-        $('#messageId').removeAttr('readonly')
-            .attr('placeholder', '{{Activity.Message.Id}}');
-        $('#whatsAppChannelId').removeAttr('readonly')
-            .attr('placeholder', '{{Activity.Channel.Id}}');
-        $('#templateName').removeAttr('readonly')
-            .attr('placeholder', '{{Activity.Message.TemplateName}}');
 
         $('#deKeyDisplay')
             .css('background', '#fff3e0')
@@ -217,9 +193,9 @@
         var mobile = $('#mobileNumber').val()      || '{{Event.' + deKey + '.MobileNumber}}';
         var lead   = $('#leadId').val()            || '{{Event.' + deKey + '.LeadId}}';
         var app    = $('#applicationId').val()     || '{{Event.' + deKey + '.ApplicationId}}';
-        var msgId  = $('#messageId').val()         || '{{Activity.Message.Id}}';
-        var waChId = $('#whatsAppChannelId').val() || '{{Activity.Channel.Id}}';
-        var tmpl   = $('#templateName').val()      || '{{Activity.Message.TemplateName}}';
+        var msgId  = $('#messageId').val()         
+        var waChId = $('#whatsAppChannelId').val() 
+        var tmpl   = $('#templateName').val()      
 
         payload.arguments.execute.inArguments = [
             { "subscriberKey":     "{{Contact.Key}}" },
@@ -229,7 +205,7 @@
             { "journeyId":         "{{Interaction.InteractionId}}" },
             { "journeyVersion":    "{{Interaction.InteractionVersionId}}" },
             { "activityId":        "{{Activity.Id}}" },
-            { "activityName":      "{{Activity.Name}}" },
+            { "activityName":      "" },
             { "messageId":         msgId },
             { "whatsAppChannelId": waChId },
             { "templateName":      tmpl },
