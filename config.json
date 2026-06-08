@@ -2,14 +2,14 @@
   "workflowApiVersion": "1.1",
   "metaData": {
     "category": "message",
-    "icon": "https://cdn-icons-png.flaticon.com/512/724/724664.png",
+    "icon": "https://cdn-icons-png.flaticon.com/512/733/733585.png",
     "configOnDrop": true
   },
   "type": "REST",
   "lang": {
     "en-US": {
-      "name": "SMS Logger",
-      "description": "Logs SMS data into SendLogMasterSMS"
+      "name": "Whatsapp Logger",
+      "description": "Logs Whatsapp data into SendLogMasterWhatsapp"
     }
   },
   "arguments": {
